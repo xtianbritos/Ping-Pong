@@ -29,6 +29,9 @@
         this.speed_x = 3;
         this.board = board;
         this.direction = 1;
+        this.bounce_angle = 0;
+        this.max_bounce_angle = Math.PI / 12;
+        this.speed = 3;
 
         board.ball = this;
         this.kind = "circle";
@@ -39,7 +42,29 @@
             //Cuando direction sea 1 la bola se mueve a la derecha y cuando sea -1 se mueve a la izquierda
             this.x += (this.speed_x * this.direction);
             this.y += (this.speed_y);
-            
+        },
+        get width(){
+            return this.radius * 2;
+        },
+        get height(){
+            return this.radius * 2;
+        },
+        collision: function(bar){
+            //Reacciona a la bola colisiona de una barra que recibe como parametro y le cambia su dirección
+            let relative_intersect_y = (bar.y+(bar.height/2)) -this.y;
+
+            let normalized_intersect_y = relative_intersect_y / (bar.height/2);
+
+            this.bounce_angle =normalized_intersect_y * this.max_bounce_angle;
+
+            this.speed_y = this.speed * -Math.sin(this.bounce_angle);
+            this.speed_x = this.speed * Math.cos(this.bounce_angle);
+
+            if(this.x > (this.board.width /2)){
+                this.direction = -1;
+            }else{
+                this.direction = 1;
+            }
         }
     }
 }) ();
@@ -87,6 +112,14 @@
                 draw(this.ctx, el);
             }
         },
+        check_collisions: function(){
+            for (let i=this.board.bars.length-1 ; i>=0; i--) {
+                let bar = this.board.bars[i];
+                if(hit(bar, this.board.ball)){
+                    this.board.ball.collision(bar);
+                }
+            }
+        },
         play: function(){
             //Si el juego no está en pausa
             if (this.board.playing){
@@ -94,10 +127,39 @@
                 this.clean();
                 //Indicamos que se dibujen todos los elementos
                 this.draw();
+                //Indicamos que chequee las colisiones
+                this.check_collisions();
                 //Indicamos que se mueva la pelota
                 this.board.ball.move();
             }
         }
+    }
+
+    //Función que revisa si hay colisiones
+    function hit(a, b){
+        let hit = false;
+
+        //colisiones horizontales
+        if(b.x + b.width >= a.x && b.x < a.x + a.width){
+            //Colisiones verticales
+            if(b.y + b.height >= a.y && b.y < a.y + a.height){
+                hit = true;
+            }
+        }
+        //Colision de a con b
+        if(b.x <= a.x && b.x + b.width >= a.x + a.width){
+            if(b.y <= a.y && b.y + b.height >= a.y + a.height){
+                hit = true;
+            }
+        }
+        //colisión de b con a
+        if(a.x <= b.x && a.x + a.width >= b.x + b.width){
+            if(a.y <= b.y && a.y + a.height >= b.y + b.height){
+                hit = true;
+            }
+        }
+
+        return hit;
     }
 
     //Función que dibuja elementos
@@ -128,18 +190,18 @@ let ball = new Ball(350, 100, 10, board);
 document.addEventListener("keydown", function(e){
     
     //Si oprimimos la tecla abajo o arriba movemos la barra 1
-    if(e.keyCode === 38){
+    if(e.keyCode === 87){
         e.preventDefault();
         bar1.up();
-    }else if(e.keyCode === 40){
+    }else if(e.keyCode === 83){
         e.preventDefault();
         bar1.down();
     }
     //Si oprimimos W o S movemos la barra 2
-    else if(e.keyCode === 87){
+    else if(e.keyCode === 38){
         e.preventDefault();
         bar2.up();
-    }else if (e.keyCode === 83){
+    }else if (e.keyCode === 40){
         e.preventDefault();
         bar2.down();
     }
