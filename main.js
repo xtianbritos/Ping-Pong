@@ -7,12 +7,13 @@
         this.game_over = false;
         this.bars =[];
         this.ball = null;
+        this.playing = false;
     }
 
     //Modificamos el prototipo de la clase para colocar métodos
     self.Board.prototype = {
         get elements(){
-            let elements = this.bars.map(function(bar){ return bar; }); //Hacemos una copia del arreglo
+            let elements = this.bars.map(function(bar){ return bar; }); //Hacemos una copia del arreglo para evitar un error al llenarse la memoria
             elements.push(this.ball);
             return elements;
         }
@@ -27,8 +28,19 @@
         this.speed_y = 0;
         this.speed_x = 3;
         this.board = board;
+        this.direction = 1;
+
         board.ball = this;
         this.kind = "circle";
+    }
+    
+    self.Ball.prototype = {
+        move: function(){
+            //Cuando direction sea 1 la bola se mueve a la derecha y cuando sea -1 se mueve a la izquierda
+            this.x += (this.speed_x * this.direction);
+            this.y += (this.speed_y);
+            
+        }
     }
 }) ();
 
@@ -76,10 +88,15 @@
             }
         },
         play: function(){
-            //Indicamos que se limpie con cada cambio
-            this.clean();
-            //Indicamos que se dibujen todos los elementos
-            this.draw();
+            //Si el juego no está en pausa
+            if (this.board.playing){
+                //Indicamos que se limpie con cada cambio
+                this.clean();
+                //Indicamos que se dibujen todos los elementos
+                this.draw();
+                //Indicamos que se mueva la pelota
+                this.board.ball.move();
+            }
         }
     }
 
@@ -109,22 +126,32 @@ let ball = new Ball(350, 100, 10, board);
 
 
 document.addEventListener("keydown", function(e){
-    //Evitamos que el navegador baje la página al tocar las teclas direccionales
-    e.preventDefault()
     
     //Si oprimimos la tecla abajo o arriba movemos la barra 1
     if(e.keyCode === 38){
+        e.preventDefault();
         bar1.up();
     }else if(e.keyCode === 40){
+        e.preventDefault();
         bar1.down();
     }
     //Si oprimimos W o S movemos la barra 2
     else if(e.keyCode === 87){
+        e.preventDefault();
         bar2.up();
     }else if (e.keyCode === 83){
+        e.preventDefault();
         bar2.down();
     }
+    //Si oprimimos la barra espaciadora se pausa o reanuda el juego
+    else if (e.keyCode === 32){
+        e.preventDefault();
+        board.playing = !board.playing;
+    }
 });
+
+//Dibujamos los elementos para ver algo aunque no se oprima la barra espaciadora
+board_view.draw();
 
 //Animamos las barras
 self.requestAnimationFrame(controller);
