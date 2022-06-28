@@ -13,7 +13,7 @@
     self.Board.prototype = {
         get elements(){
             let elements = this.bars;
-            elements.push(this.ball);
+            // elements.push(this.ball);
             return elements;
         }
     }
@@ -37,7 +37,7 @@
             this.y += this.speed; //Le aumentamos la velocidad a la coordinada Y
         },
         up: function(){
-            this.x -= this.speed; //Le reducimos la velocidad a la coordinada X
+            this.y -= this.speed; //Le reducimos la velocidad a la coordinada Y
         }
     }
 }) ();
@@ -52,6 +52,9 @@
     }
 
     self.BoardView.prototype = {
+        clean: function(){
+            this.ctx.clearRect(0, 0, this.board.width, this.board.height);
+        },
         draw: function(){
             for(let i=this.board.elements.length-1; i>=0; i--){
                 let el = this.board.elements[i];
@@ -64,15 +67,11 @@
 
     //Función que dibuja
     function draw(ctx, element){
-        //Si el elemento no es nulo y tiene una propiedad kind ejecutamos el switch 
-        if(element !== null && element.hasOwnProperty("kind")){
-            switch(element.kind){
-                case "rectangle":
-                    ctx.fillRect(element.x, element.y, element.width, element.height);
-                    break;
-            }
+        switch(element.kind){
+            case "rectangle":
+                ctx.fillRect(element.x, element.y, element.width, element.height);
+                break;
         }
-        
     }
 }) ();
 
@@ -85,18 +84,35 @@ let board_view = new BoardView(canvas, board);
 
 
 document.addEventListener("keydown", function(e){
+    //Evitamos que el navegador baje la página al tocar las teclas direccionales
+    e.preventDefault()
+    
     //Si oprimimos la tecla abajo o arriba movemos la barra 1
-    if(e.keyCode == 38){
+    if(e.keyCode === 38){
         bar1.up();
-    }else if(e.keyCode == 40){
+    }else if(e.keyCode === 40){
         bar1.down();
+    }
+    //Si oprimimos W o S movemos la barra 2
+    else if(e.keyCode === 87){
+        bar2.up();
+    }else if (e.keyCode === 83){
+        bar2.down();
     }
 });
 
+//Animamos las barras
+self.requestAnimationFrame(controller);
 
-self.addEventListener("load", main);
+function controller(){
 
-function main(){
+    //Indicamos que se limpie con cada cambio
+    board_view.clean();
+
     //Indicamos que se dibujen todos los elementos
     board_view.draw();
+
+    //Para que se ejecute cosntantemente la animación lo colocamos aquí también
+    self.requestAnimationFrame(controller);
+
 }
