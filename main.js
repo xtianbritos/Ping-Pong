@@ -1,5 +1,6 @@
-//Función anónima que se ejecuta a sí misma
+//Funciones anónimas que se ejecutan a sí mismas
 (function(){
+    //Se crea la clase Board
     self.Board = function(width, height) {
         this.width = width;
         this.height = height;
@@ -21,6 +22,7 @@
 }) ();
 
 (function(){
+        //Se crea la clase Ball
     self.Ball = function(x, y, radius, board){
         this.x = x;
         this.y = y;
@@ -70,6 +72,7 @@
 }) ();
 
 (function(){
+    //Se crea la clase Bar
     self.Bar = function(x, y, width, height, board){
         this.x = x;
         this.y = y;
@@ -93,6 +96,7 @@
 }) ();
 
 (function(){
+    //Se crea la clase BoardView
     self.BoardView = function(canvas, board){
         this.canvas = canvas;
         this.canvas.width = board.width;
