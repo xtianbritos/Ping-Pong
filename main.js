@@ -12,7 +12,7 @@
     //Modificamos el prototipo de la clase para colocar métodos
     self.Board.prototype = {
         get elements(){
-            let elements = this.bars;
+            let elements = this.bars.map(function(bar){ return bar; }); //Hacemos una copia del arreglo
             elements.push(this.ball);
             return elements;
         }
@@ -71,7 +71,6 @@
         draw: function(){
             for(let i=this.board.elements.length-1; i>=0; i--){
                 let el = this.board.elements[i];
-
                 //Dibujamos el contexto y el elemento
                 draw(this.ctx, el);
             }
