@@ -26,15 +26,19 @@
         this.width = width;
         this.height = height;
         this.board = board;
-
-        //Le agrego este objeto a las barras del board
-        this.board.bars.push(this);
+        this.board.bars.push(this); //Le agrego este objeto a las barras del board
         this.kind = "rectangle";
+        this.speed = 10;
     }
 
+    //Agregamos métodos para mover las  barras
     self.Bar.prototype = {
-        down: function(){},
-        up: function(){}
+        down: function(){
+            this.y += this.speed; //Le aumentamos la velocidad a la coordinada Y
+        },
+        up: function(){
+            this.x -= this.speed; //Le reducimos la velocidad a la coordinada X
+        }
     }
 }) ();
 
@@ -72,19 +76,27 @@
     }
 }) ();
 
+//Instanciamos los objetos 
+let board = new Board(800, 400);
+let bar1 = new Bar(20, 100, 40, 100, board);
+let bar2 = new Bar(735, 100, 40, 100, board);
+let canvas = document.getElementById("canvas");
+let board_view = new BoardView(canvas, board);
+
+
+document.addEventListener("keydown", function(e){
+    //Si oprimimos la tecla abajo o arriba movemos la barra 1
+    if(e.keyCode == 38){
+        bar1.up();
+    }else if(e.keyCode == 40){
+        bar1.down();
+    }
+});
+
+
 self.addEventListener("load", main);
 
 function main(){
-    //Instanciamos los objetos 
-    let board = new Board(800, 400);
-
-    let bar1 = new Bar(20, 100, 40, 100, board);
-    let bar2 = new Bar(735, 100, 40, 100, board);
-
-    let canvas = document.getElementById("canvas");
-
-    let board_view = new BoardView(canvas, board);
-
     //Indicamos que se dibujen todos los elementos
     board_view.draw();
 }
