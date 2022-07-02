@@ -9,6 +9,8 @@
         this.bars =[];
         this.ball = null;
         this.playing = false;
+        this.player1 = 0;
+        this.player2 = 0;
     }
 
     //Modificamos el prototipo de la clase para colocar métodos
@@ -69,34 +71,21 @@
             }
         },
         borders: function(){
-            // Reacciona si la bola colisiona con los bordes laterales
+            //Reacciona si la bola colisiona con los bordes laterales
             if(this.y <= 10 || this.y >= this.board.height-10){
                 this.speed_y = -this.speed_y;
             }
-        }
-    }
-}) ();
-
-(function(){
-    //Se crea la clase Bar
-    self.Bar = function(x, y, width, height, board){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.board = board;
-        this.board.bars.push(this); //Le agrego este objeto a las barras del board
-        this.kind = "rectangle";
-        this.speed = 10;
-    }
-
-    //Agregamos métodos para mover las  barras
-    self.Bar.prototype = {
-        down: function(){
-            this.y += this.speed; //Le aumentamos la velocidad a la coordinada Y
         },
-        up: function(){
-            this.y -= this.speed; //Le reducimos la velocidad a la coordinada Y
+        point: function(){
+            //Reacciona si la bola sobrepasa los limites de los lados
+            if(this.x > this.board.width){
+                return 1;
+            }
+            if(this.x < 0){
+                return 2;
+            }else{
+                return 0;
+            }
         }
     }
 }) ();
@@ -129,7 +118,37 @@
                     this.board.ball.collision(bar);
                 }
             }
+
             this.board.ball.borders();
+
+            let point = this.board.ball.point();
+
+            if(point == 1){
+                this.board.ball = new Ball(350, 100, 10, board);
+                this.board.playing = false;
+                this.board.player1++;
+                if(this.board.player1 == 5){
+                    alert("¡Felicitaciones jugador 1! \n ¡Ganaste la partida!");
+                    this.board.player1 = 0;
+                    this.board.player2 = 0;
+                }
+                else {
+                    alert("¡Punto para el jugador 1! \n LLevas " + this.board.player1)
+                }
+            }
+            if(point == 2){
+                this.board.ball = new Ball(350, 100, 10, board);
+                this.board.playing = false;
+                this.board.player2++;
+                if(this.board.player2 == 5){
+                    alert("¡Felicitaciones jugador 2! \n ¡Ganaste la partida!");
+                    this.board.player1 = 0;
+                    this.board.player2 = 0;
+                }
+                else {
+                    alert("¡Punto para el jugador 2! \n LLevas " + this.board.player2)
+                }
+            }
         },
         play: function(){
             //Si el juego no está en pausa
@@ -150,7 +169,7 @@
     function hit(a, b){
         let hit = false;
 
-        //colisiones horizontales
+        //Colisiones horizontales
         if(b.x + b.width >= a.x && b.x < a.x + a.width){
             //Colisiones verticales
             if(b.y + b.height >= a.y && b.y < a.y + a.height){
@@ -163,7 +182,7 @@
                 hit = true;
             }
         }
-        //colisión de b con a
+        //Colision de b con a
         if(a.x <= b.x && a.x + a.width >= b.x + b.width){
             if(a.y <= b.y && a.y + a.height >= b.y + b.height){
                 hit = true;
@@ -186,6 +205,35 @@
                 ctx.fill();
                 ctx.closePath();
                 break;
+        }
+    }
+}) ();
+
+
+(function(){
+    //Se crea la clase Bar
+    self.Bar = function(x, y, width, height, board){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.board = board;
+        this.board.bars.push(this); //Le agrego este objeto a las barras del board
+        this.kind = "rectangle";
+        this.speed = 10;
+    }
+
+    //Agregamos métodos para mover las  barras
+    self.Bar.prototype = {
+        down: function(){
+            if(this.y + this.height <= this.board.height){
+                this.y += this.speed; //Le aumentamos la velocidad a la coordinada Y
+            }
+        },
+        up: function(){
+            if(this.y > 0){
+                this.y -= this.speed; //Le reducimos la velocidad a la coordinada Y
+            }
         }
     }
 }) ();
