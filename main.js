@@ -52,7 +52,7 @@
             return this.radius * 2;
         },
         collision: function(bar){
-            //Reacciona a la bola colisiona de una barra que recibe como parametro y le cambia su dirección
+            //Reacciona si la bola colisiona con una barra que recibe como parametro y le cambia su dirección
             let relative_intersect_y = (bar.y+(bar.height/2)) -this.y;
 
             let normalized_intersect_y = relative_intersect_y / (bar.height/2);
@@ -66,6 +66,12 @@
                 this.direction = -1;
             }else{
                 this.direction = 1;
+            }
+        },
+        borders: function(){
+            // Reacciona si la bola colisiona con los bordes laterales
+            if(this.y <= 10 || this.y >= this.board.height-10){
+                this.speed_y = -this.speed_y;
             }
         }
     }
@@ -123,6 +129,7 @@
                     this.board.ball.collision(bar);
                 }
             }
+            this.board.ball.borders();
         },
         play: function(){
             //Si el juego no está en pausa
@@ -174,6 +181,7 @@
                 break;
             case "circle":
                 ctx.beginPath();
+                ctx.fillStyle = "blue"
                 ctx.arc(element.x, element.y, element.radius, 0, 7);
                 ctx.fill();
                 ctx.closePath();
